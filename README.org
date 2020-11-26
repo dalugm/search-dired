@@ -1,0 +1,42 @@
+* Introduction
+
+A fork of ~find-dired~.
+
+Search file with given regexp and dired the output.
+
+Use [[https://github.com/sharkdp/fd][fd]] by default. If ~fd~ does not exist, fall back to ~find~.
+
+Check out [[https://www.masteringemacs.org/article/working-multiple-files-dired][this]] for functionality and use case of ~find-dired~.
+
+* Installation
+
+#+begin_src elisp
+  (add-to-list 'load-path "path/to/search-dired")
+  (require 'search-dired)
+#+end_src
+
+* Usage
+** Variables
+- ~search-dired-program~
+
+  Use which program to search file.
+
+  Support ~fd~ and ~find~ for now.
+
+- ~search-dired-fd-args~
+
+  Arguments which ~fd~ only.
+
+- ~search-dired-ls-option~
+- ~search-dired-exec-terminator~
+
+** Functions
+
+- ~search-dired-dwim~
+
+  Search files under current directory.
+
+- ~search-dired~
+
+  Customize search.
+
