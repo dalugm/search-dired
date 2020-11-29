@@ -114,7 +114,7 @@ specifies what to use in place of \"-ls\" as the final argument."
       (when proc
         (if (or (not (eq (process-status proc) 'run))
                 (yes-or-no-p
-                 (format-message "`search-dired-program' process is running; kill it? ")))
+                  (format-message "`search-dired-program' process is running; kill it? ")))
             (condition-case nil
                 (progn
                   (interrupt-process proc)
@@ -182,8 +182,7 @@ specifies what to use in place of \"-ls\" as the final argument."
       (set-process-filter proc (function search-dired-filter))
       (set-process-sentinel proc (function search-dired-sentinel))
       ;; Initialize the process marker; it is used by the filter.
-      (move-marker (process-mark proc) (point) (current-buffer)))
-    ))
+      (move-marker (process-mark proc) (point) (current-buffer)))))
 
 (defun search-dired-kill-find ()
   "Kill the `search-dired-program' process running in the current buffer."
@@ -239,11 +238,11 @@ specifies what to use in place of \"-ls\" as the final argument."
                 ;; Find all the complete lines in the unprocessed
                 ;; output and process it to add text properties.
                 (goto-char (point-max))
-                (if (search-backward "\n" (process-mark proc) t)
-                    (progn
-                      (dired-insert-set-properties (process-mark proc)
-                                                   (1+ (point)))
-                      (move-marker (process-mark proc) (1+ (point)))))))))
+                (when (search-backward "\n" (process-mark proc) t)
+                  (progn
+                    (dired-insert-set-properties (process-mark proc)
+                                                 (1+ (point)))
+                    (move-marker (process-mark proc) (1+ (point)))))))))
       ;; The buffer has been killed.
       (delete-process proc))))
 
@@ -251,18 +250,18 @@ specifies what to use in place of \"-ls\" as the final argument."
   "Use PROC to sentinel STATE for \\[search-dired] processes."
   (let ((buf (process-buffer proc))
         (inhibit-read-only t))
-    (if (buffer-name buf)
-        (with-current-buffer buf
-          (let ((buffer-read-only nil))
-            (save-excursion
-              (goto-char (point-max))
-              (let ((point (point)))
-                (insert "\n"
-                  (substring state 0 -1) ; omit \n at end of STATE.
-                  " at " (substring (current-time-string) 0 19))
-                (dired-insert-set-properties point (point)))
-              (delete-process proc)))
-          (message "search-dired %s finished." (current-buffer))))))
+    (when (buffer-name buf)
+      (with-current-buffer buf
+        (let ((buffer-read-only nil))
+          (save-excursion
+            (goto-char (point-max))
+            (let ((point (point)))
+              (insert "\n"
+                (substring state 0 -1)  ; omit \n at end of STATE.
+                " at " (substring (current-time-string) 0 19))
+              (dired-insert-set-properties point (point)))
+            (delete-process proc)))
+        (message "search-dired finished.")))))
 
 (provide 'search-dired)
 
