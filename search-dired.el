@@ -25,8 +25,9 @@
 
 
 ;;; Commentary:
-
+;;
 ;; Enhance find-dired
+;;
 
 ;;; Code:
 
@@ -60,7 +61,7 @@ the default \";\" variant executes \"ls\" for each found file."
 
 (defcustom search-dired-ls-option
   (if (string= search-dired-program "fd")
-      (cons (concat"| xargs -0 " insert-directory-program " -ld --quoting-style=literal") "-ld")
+      (cons (concat "| xargs -0 " insert-directory-program " -ld --quoting-style=literal") "-ld")
     (cons "-ls" "-alhuG1v"))
   "A pair of options to produce and parse an `ls -l'-type list from `search-dired-program'."
   :type '(cons (string :tag "Search Option")
@@ -73,11 +74,10 @@ the default \";\" variant executes \"ls\" for each found file."
   :type 'string)
 
 (defvar search-dired-args nil
-  "Last arguments given to `search-dired-program' by \\[search-dired].")
+  "Last arguments given to `search-dired-program'.")
 
-(defvar search-dired-args-history nil)
-
-(defvar dired-sort-inhibit)
+(defvar search-dired-history nil
+  "Search history.  Use `M-n' and `M-p' to switch between.")
 
 ;;;###autoload
 (defun search-dired-dwim (file)
@@ -98,7 +98,7 @@ except that the car of the variable `search-dired-ls-option'
 specifies what to use in place of \"-ls\" as the final argument."
   (interactive (list (read-directory-name "Search in directory: " nil "" t)
                      (read-string "Search (with args): " search-dired-args
-                                  '(search-dired-args-history . 1))))
+                                  '(search-dired-history . 1))))
   (let ((dired-buffers dired-buffers))
     ;; Expand DIR ("" means default-directory), and make sure it has a
     ;; trailing slash.
