@@ -4,7 +4,7 @@
 ;; Maintainer: dalu <mou.tong@qq.com>
 ;; Version: 0.1
 ;; Package-Requires: ((emacs "25"))
-;; Homepage: https://www.github.com/dalu98/search-dired
+;; Homepage: https://www.github.com/dalugm/search-dired
 ;; Keywords: search, file, dired
 
 
