@@ -1,10 +1,8 @@
 ;;; search-dired.el --- Enhance find-dired -*- lexical-binding: t -*-
 
-;; Copyright (C) 2020-2021 dalu
-
 ;; Author: dalu <mou.tong@qq.com>
 ;; Maintainer: dalu <mou.tong@qq.com>
-;; Version: 0.1
+;; Version: 0.1.0
 ;; Package-Requires: ((emacs "25"))
 ;; Homepage: https://www.github.com/dalugm/search-dired
 ;; Keywords: search, file, dired
@@ -26,7 +24,7 @@
 
 ;;; Commentary:
 ;;
-;; Enhance find-dired
+;; Enhance `find-dired'.
 ;;
 
 ;;; Code:
