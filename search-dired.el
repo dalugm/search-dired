@@ -104,7 +104,7 @@ specifies what to use in place of \"-ls\" as the final argument."
     ;; Check that it's really a directory.
     (or (file-directory-p dir)
         (error "Search-dired needs a directory: %s" dir))
-    (switch-to-buffer (get-buffer-create "Search Dired"))
+    (switch-to-buffer (get-buffer-create "*Search Dired*"))
 
     ;; See if there's already a `search-dired-program' running
     ;; If true, kill it first
