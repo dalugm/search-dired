@@ -44,8 +44,8 @@
 (defcustom search-dired-exec-terminator
   (if (eq 0
           (ignore-errors
-            (process-file search-dired-program nil nil nil
-                          null-device "-exec" "echo" "{}" "+")))
+           (process-file search-dired-program nil nil nil
+                         null-device "-exec" "echo" "{}" "+")))
       "+"
     (shell-quote-argument ";"))
   "String that terminates \"find -exec COMMAND {} \".
@@ -59,7 +59,10 @@ the default \";\" variant executes \"ls\" for each found file."
 
 (defcustom search-dired-ls-option
   (if (string= search-dired-program "fd")
-      (cons (concat "| xargs -0 " insert-directory-program " -ld --quoting-style=literal") "-ld")
+      (cons (concat "| xargs -0 "
+                    insert-directory-program
+                    " -ld --quoting-style=literal")
+            "-ld")
     (cons "-ls" "-alhuG1v"))
   "A pair of options to produce and parse an `ls -l'-type list from `search-dired-program'."
   :type '(cons (string :tag "Search Option")
@@ -80,22 +83,24 @@ the default \";\" variant executes \"ls\" for each found file."
 ;;;###autoload
 (defun search-dired-dwim (file)
   "Search FILE under current working directory."
-  (interactive "ssearch file: ")
+  (interactive "sSearch file (with args): ")
   (search-dired default-directory
     (if (string= search-dired-program "fd")
         (format "--type f %s" file)
       (format "-type f -name '*%s*'" file))))
 
 (defun search-dired (dir args)
-  "Run `search-dired-program' and go into Dired mode on a buffer of the output.
+  "Run `search-dired-program' and Dired the output on a buffer.
+
 The command run (after changing into DIR) is essentially
 
-    `search-dired-program . ARGS -ls
+    `search-dired-program . ARGS -ls'
 
 except that the car of the variable `search-dired-ls-option'
 specifies what to use in place of \"-ls\" as the final argument."
   (interactive (list (read-directory-name "Search in directory: " nil "" t)
-                     (read-string "Search (with args): " search-dired-args
+                     (read-string "Search file (with args): "
+                                  search-dired-args
                                   '(search-dired-history . 1))))
   (let ((dired-buffers dired-buffers))
     ;; Expand DIR ("" means default-directory), and make sure it has a
@@ -103,7 +108,7 @@ specifies what to use in place of \"-ls\" as the final argument."
     (setq dir (file-name-as-directory (expand-file-name dir)))
     ;; Check that it's really a directory.
     (or (file-directory-p dir)
-        (error "Search-dired needs a directory: %s" dir))
+        (error "Search-Dired needs a directory: %s" dir))
     (switch-to-buffer (get-buffer-create "*Search Dired*"))
 
     ;; See if there's already a `search-dired-program' running
@@ -112,14 +117,16 @@ specifies what to use in place of \"-ls\" as the final argument."
       (when proc
         (if (or (not (eq (process-status proc) 'run))
                 (yes-or-no-p
-                  (format-message "`search-dired-program' process is running; kill it? ")))
+                 (format-message
+                   "`search-dired-program' process is running; kill it? ")))
             (condition-case nil
                 (progn
                   (interrupt-process proc)
                   (sit-for 1)
                   (delete-process proc))
               (error nil))
-          (error "Cannot have two processes in `%s' at once" (buffer-name)))))
+          (error "Cannot have two processes in `%s' at once"
+                 (buffer-name)))))
 
     ;; prepare buffer
     (widen)
@@ -137,11 +144,11 @@ specifies what to use in place of \"-ls\" as the final argument."
                  (if (string= args "")
                      ""
                    (concat
-                     " " args " "
-                     " "))
+                     " " args " "))
                  (if (string-match "\\`\\(.*\\) {} \\(\\\\;\\|+\\)\\'"
-                       (car search-dired-ls-option))
-                     (format "%s %s %s"
+                                   (car search-dired-ls-option))
+                     (format
+                       "%s %s %s"
                        (match-string 1 (car search-dired-ls-option))
                        (shell-quote-argument "{}")
                        search-dired-exec-terminator)
@@ -150,12 +157,13 @@ specifies what to use in place of \"-ls\" as the final argument."
     (shell-command (concat args "&") (current-buffer))
 
     ;; enable Dired mode
-    ;; The next statement will bomb in classic dired (no optional arg allowed)
+    ;; The next statement will bomb in classic dired
+    ;; (no optional arg allowed)
     (dired-mode dir (cdr search-dired-ls-option))
     ;; provide a keybinding to kill the search-dired-program
     (let ((map (make-sparse-keymap)))
       (set-keymap-parent map (current-local-map))
-      (define-key map "\C-c\C-k" 'search-dired-kill-find)
+      (define-key map "\C-c\C-k" #'search-dired-kill-find)
       (use-local-map map))
     ;; disable Dired sort
     (make-local-variable 'dired-sort-inhibit)
@@ -170,8 +178,8 @@ specifies what to use in place of \"-ls\" as the final argument."
     ;; subdir-alist points there.
     (insert "  " dir ":\n")
 
-    ;; Make second line a ``find'' line in analogy to the ``total'' or
-    ;; ``wildcard'' line.
+    ;; Make second line a `find' line in analogy to the `total' or
+    ;; `wildcard' line.
     (let ((point (point)))
       (insert "  " args "\n")
       (dired-insert-set-properties point (point)))
@@ -193,7 +201,7 @@ specifies what to use in place of \"-ls\" as the final argument."
         (error nil)))))
 
 (defun search-dired-filter (proc string)
-  "Use PROC to filter STRING for \\[search-dired] processes."
+  "Use PROC to filter STRING for `search-dired' processes."
   (let ((buf (process-buffer proc))
         (inhibit-read-only t))
     (if (buffer-name buf)
@@ -203,10 +211,14 @@ specifies what to use in place of \"-ls\" as the final argument."
               (widen)
               (let ((buffer-read-only nil)
                     (beg (point-max))
-                    (l-opt (and (consp search-dired-ls-option)
-                                (string-match "l" (cdr search-dired-ls-option))))
-                    (ls-regexp (concat "^ +[^ \t\r\n]+\\( +[^ \t\r\n]+\\) +"
-                                       "[^ \t\r\n]+ +[^ \t\r\n]+\\( +[^[:space:]]+\\)")))
+                    (l-opt
+                     (and (consp search-dired-ls-option)
+                          (string-match "l"
+                                        (cdr search-dired-ls-option))))
+                    (ls-regexp
+                     (concat
+                      "^ +[^ \t\r\n]+\\( +[^ \t\r\n]+\\) +"
+                      "[^ \t\r\n]+ +[^ \t\r\n]+\\( +[^[:space:]]+\\)")))
                 (goto-char beg)
                 (insert string)
                 (goto-char beg)
@@ -245,7 +257,7 @@ specifies what to use in place of \"-ls\" as the final argument."
       (delete-process proc))))
 
 (defun search-dired-sentinel (proc state)
-  "Use PROC to sentinel STATE for \\[search-dired] processes."
+  "Use PROC to sentinel STATE for `search-dired' processes."
   (let ((buf (process-buffer proc))
         (inhibit-read-only t))
     (when (buffer-name buf)
@@ -255,7 +267,7 @@ specifies what to use in place of \"-ls\" as the final argument."
             (goto-char (point-max))
             (let ((point (point)))
               (insert "\n"
-                (substring state 0 -1)  ; omit \n at end of STATE.
+                (substring state 0 -1)  ; omit '\n' at end of STATE.
                 " at " (substring (current-time-string) 0 19))
               (dired-insert-set-properties point (point)))
             (delete-process proc)))
