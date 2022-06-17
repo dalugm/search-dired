@@ -64,7 +64,7 @@ the default \";\" variant executes \"ls\" for each found file."
                     " -ld --quoting-style=literal")
             "-ld")
     (cons "-ls" "-alhuG1v"))
-  "A pair of options to produce and parse an `ls -l'-type list from `search-dired-program'."
+  "Options to customize list from `search-dired-program'."
   :type '(cons (string :tag "Search Option")
                (string :tag "Ls Switches"))
   :group 'search-dired)
