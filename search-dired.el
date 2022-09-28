@@ -44,8 +44,8 @@
 (defcustom search-dired-exec-terminator
   (if (eq 0
           (ignore-errors
-           (process-file search-dired-program nil nil nil
-                         null-device "-exec" "echo" "{}" "+")))
+            (process-file search-dired-program nil nil nil
+                          null-device "-exec" "echo" "{}" "+")))
       "+"
     (shell-quote-argument ";"))
   "String that terminates \"find -exec COMMAND {} \".
@@ -85,9 +85,9 @@ the default \";\" variant executes \"ls\" for each found file."
   "Search FILE under current working directory."
   (interactive "sSearch file (with args): ")
   (search-dired default-directory
-    (if (string= search-dired-program "fd")
-        (format "--type f %s" file)
-      (format "-type f -name '*%s*'" file))))
+                (if (string= search-dired-program "fd")
+                    (format "--type f %s" file)
+                  (format "-type f -name '*%s*'" file))))
 
 (defun search-dired (dir args)
   "Run `search-dired-program' and Dired the output on a buffer.
@@ -118,7 +118,7 @@ specifies what to use in place of \"-ls\" as the final argument."
         (if (or (not (eq (process-status proc) 'run))
                 (yes-or-no-p
                  (format-message
-                   "`search-dired-program' process is running; kill it? ")))
+                  "`search-dired-program' process is running; kill it? ")))
             (condition-case nil
                 (progn
                   (interrupt-process proc)
@@ -138,21 +138,21 @@ specifies what to use in place of \"-ls\" as the final argument."
     (setq default-directory dir
           search-dired-args args        ; save for next interactive call
           args (concat search-dired-program
-                 (if (string= search-dired-program "fd")
-                     (concat " " search-dired-fd-args)
-                   " . ")
-                 (if (string= args "")
-                     ""
-                   (concat
-                     " " args " "))
-                 (if (string-match "\\`\\(.*\\) {} \\(\\\\;\\|+\\)\\'"
-                                   (car search-dired-ls-option))
-                     (format
-                       "%s %s %s"
-                       (match-string 1 (car search-dired-ls-option))
-                       (shell-quote-argument "{}")
-                       search-dired-exec-terminator)
-                   (car search-dired-ls-option))))
+                       (if (string= search-dired-program "fd")
+                           (concat " " search-dired-fd-args)
+                         " . ")
+                       (if (string= args "")
+                           ""
+                         (concat
+                          " " args " "))
+                       (if (string-match "\\`\\(.*\\) {} \\(\\\\;\\|+\\)\\'"
+                                         (car search-dired-ls-option))
+                           (format
+                            "%s %s %s"
+                            (match-string 1 (car search-dired-ls-option))
+                            (shell-quote-argument "{}")
+                            search-dired-exec-terminator)
+                         (car search-dired-ls-option))))
     ;; Start the `search-dired-program' process.
     (shell-command (concat args "&") (current-buffer))
 
@@ -195,10 +195,10 @@ specifies what to use in place of \"-ls\" as the final argument."
   (interactive)
   (let ((proc (get-buffer-process (current-buffer))))
     (and proc (eq (process-status proc) 'run)
-      (eq (process-filter proc) (function search-dired-filter))
-      (condition-case nil
-        (delete-process proc)
-        (error nil)))))
+         (eq (process-filter proc) (function search-dired-filter))
+         (condition-case nil
+             (delete-process proc)
+           (error nil)))))
 
 (defun search-dired-filter (proc string)
   "Use PROC to filter STRING for `search-dired' processes."
@@ -267,8 +267,8 @@ specifies what to use in place of \"-ls\" as the final argument."
             (goto-char (point-max))
             (let ((point (point)))
               (insert "\n"
-                (substring state 0 -1)  ; omit '\n' at end of STATE.
-                " at " (substring (current-time-string) 0 19))
+                      (substring state 0 -1) ; omit '\n' at the end of STATE.
+                      " at " (substring (current-time-string) 0 19))
               (dired-insert-set-properties point (point)))
             (delete-process proc)))
         (message "search-dired finished.")))))
